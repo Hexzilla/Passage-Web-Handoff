@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
+import { useWindowSize } from 'hooks/useWindowSize';
 import { useWallet } from 'contexts/WalletProvider';
 import { useUnityContext } from 'contexts/UnityProvider';
 import Unity, { UnityEventListener } from 'components/unity/Unity';
@@ -22,7 +23,10 @@ const unityNotifications = [
 const Play = () => {
   const { address } = useWallet();
   const { unityContext } = useUnityContext();
-  const { isLoaded, sendMessage } = unityContext;
+  const { isLoaded, sendMessage, requestFullscreen } = unityContext;
+  const { width } = useWindowSize();
+
+  const isMobile = useMemo(() => width <= 940, [width]);
 
   useEffect(() => {
     if (address) {
@@ -71,7 +75,7 @@ const Play = () => {
           perception: value('perception'),
           perception_time: value('perception_time'),
         };
-        console.log('Mint-Payload', payload)
+        console.log('Mint-Payload', payload);
         const result = await indexer.mint(payload).catch((err) => {
           console.error(err);
           toast.error('Failed to Mint!');
@@ -88,7 +92,7 @@ const Play = () => {
           await indexer.updateEntryCoinAmount(address, entryCoinAmount - 1);
           sendMessage('GFT', 'MintComplete', entryCoinAmount - 1);
 
-          toast.success('You have minted successfully!');
+          // toast.success('You have minted successfully!');
         }
       }
     },
@@ -111,17 +115,27 @@ const Play = () => {
     ];
   }, [onSyncWallet, onMint, onSendNotification]);
 
+  const setFullScreen = useCallback(() => {
+    isLoaded && requestFullscreen(true);
+  }, [isLoaded, requestFullscreen]);
+
   return (
     <div className="container mx-auto mt-4">
-      <Unity
-        unityContext={unityContext}
-        eventListeners={eventListeners}
-        styles={{
-          height: 540,
-          width: 950,
-          background: '#555',
-        }}
-      ></Unity>
+      {isMobile ? (
+        <img src="/clown_vamp.png" alt="ClownVamp" />
+      ) : (
+        <div onClick={setFullScreen}>
+          <Unity
+            unityContext={unityContext}
+            eventListeners={eventListeners}
+            styles={{
+              height: 540,
+              width: 950,
+              background: '#555',
+            }}
+          ></Unity>
+        </div>
+      )}
     </div>
   );
 };
