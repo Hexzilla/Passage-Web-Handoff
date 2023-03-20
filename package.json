@@ -5,7 +5,7 @@
   "scripts": {
     "tailwind": "npx tailwindcss -i ./src/index.css -c tailwind.config.js -o ./src/styles.css",
     "tailwind-watch": "npx tailwindcss -i ./src/index.css -c tailwind.config.js -o ./src/styles.css --watch",
-    "start": "SET PORT=3005 && react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
